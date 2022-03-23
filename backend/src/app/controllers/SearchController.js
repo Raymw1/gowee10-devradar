@@ -1,5 +1,4 @@
 const Dev = require("../models/Dev");
-const axios = require("axios");
 const parseStringAsArray = require("../utils/parseStringAsArray");
 
 class DevController {
