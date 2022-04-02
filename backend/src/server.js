@@ -3,10 +3,13 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const { setupWebSocket } = require("./websocket");
 
 class Server {
   constructor() {
     this.express = express();
+    this.server = require("http").Server(this.express);
+    setupWebSocket(this.server);
     this.middlewares();
     this.routes();
   }
@@ -23,4 +26,4 @@ class Server {
   }
 }
 
-module.exports = new Server().express;
+module.exports = new Server().server;

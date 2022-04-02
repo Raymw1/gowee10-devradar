@@ -14,11 +14,16 @@ import {
 } from "expo-location";
 import { MaterialIcons } from "@expo/vector-icons";
 import api from "../services/api";
+import { connect, disconnect, subscribeToNewDevs } from "../services/socket";
 
 export default function Main({ navigation }) {
   const [currentRegion, setCurrentRegion] = useState(null);
   const [devs, setDevs] = useState([]);
   const [techs, setTechs] = useState("");
+
+  useEffect(() => {
+    subscribeToNewDevs((dev) => setDevs([...devs, dev]));
+  }, [devs]);
 
   useEffect(() => {
     async function loadInitialLocation() {
@@ -37,12 +42,19 @@ export default function Main({ navigation }) {
     loadInitialLocation();
   }, []);
 
+  function setupWebSocket() {
+    disconnect();
+    const { latitude, longitude } = currentRegion;
+    connect(latitude, longitude, techs);
+  }
+
   async function loadDevs() {
     const { latitude, longitude } = currentRegion;
     const { data } = await api.get("/search", {
       params: { latitude, longitude, techs },
     });
     setDevs(data);
+    setupWebSocket();
   }
 
   function handleRegionChange(region) {
@@ -62,8 +74,8 @@ export default function Main({ navigation }) {
           <Marker
             key={dev._id}
             coordinate={{
-              latitude: dev.location.coordinates[0],
-              longitude: dev.location.coordinates[1],
+              latitude: dev.location.coordinates[1],
+              longitude: dev.location.coordinates[0],
             }}
           >
             <Image

@@ -1,2 +1,2 @@
 module.exports = (stringArray) =>
-  stringArray.split(",").map((tech) => tech.trim());
+  stringArray?.split(",").map((tech) => tech.trim());
